@@ -86,7 +86,7 @@ app.post('/api/exercise/add', (req, res) => {
   const date = req.body.date;
   let userId;
 
-  if (username===undefined || description === undefined || duration === undefined || date === undefined) {
+  if ((username=== undefined) || (description === undefined) || (duration === undefined) || (date === undefined)) {
     res.send("Required field(s) are missing.");
   } else if (username === '' || description === '' || duration === '') {
     res.send("Required field(s) are blank")
@@ -94,11 +94,11 @@ app.post('/api/exercise/add', (req, res) => {
     res.send("Username too long, cannot be more than 10 characters")
   } else if (description.length > 100) {
     res.send("Description length too long, should not be more than 100 characters")
-  } else if (isNan(duration)) {
+  } else if (isNaN(duration)) {
     res.send("Duration must be a number")
   } else if (Number(duration)> 1440) {
     res.send("Duration cannot be more than 1440 minutes, (24 hours)")
-  } else if (date !== '' && isNan(Date.parse(date))=== true) {
+  } else if (date !== '' && isNaN(Date.parse(date))=== true) {
     res.send("Thats not a valid date")
   } else {
    // find userID for username
@@ -126,13 +126,13 @@ app.post('/api/exercise/add', (req, res) => {
          date,
        });
 
-       newExercise.save((errSave, data=> {
+       newExercise.save((errSave, data)=> {
          if (errSave) {
            res.send("Error occured during save exercise");
          } else {
            res.json(data)
          }
-       }));
+       });
      }
    });
   }
