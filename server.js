@@ -34,9 +34,6 @@ mongoose.connect(process.env.MONGO_URI,{ useNewUrlParser: true, useUnifiedTopolo
 );
 
 
-const User = require('./models/user');
-const Exercise = require('./models/exercise');
-
 // Finally, we're saving our functions in handlers/userHandler.js, so let's make sure that the file is accessible here:
 const userHandler = require("./handlers/userHandler.js");
 
