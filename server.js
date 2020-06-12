@@ -1,21 +1,45 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-require('dotenv').config();
-const cors = require('cors')
-const mongoose = require('mongoose');
-const User = require('./models/user');
-const Exercise = require('./models/exercise');
+//////////////////////////////
+///////// CORE SETUP /////////
+//////////////////////////////
 
+// Let's start by setting up our server, requiring all needed dependencies and "activating" them.
+// Remember that any packages/dependencies that we require should be in the package.json file, from which Node.js will check the version and fetch the packages
+
+// First things first, let's set up our Express.js framework, which will make it easier to set up our web app/site:
+const express = require('express')
+// We'll define our express so we can access/use it:
 const app = express()
 
+// We'll be using the body-parser middleware to parse any incoming request (e.g. GET, POST) bodies before our handlers, making it easy to access the user's input within req.body...
+const bodyParser = require('body-parser')
+
+// ... by setting it to urlencoded, it will only parse urlencoded bodies. By setting the option extended=false, the bodyParser will only parse string and array types.
+app.use(bodyParser.urlencoded({extended: false}))
+
+// ... we'll also make the bodyParser parse incoming JSON requests to be able to handle the exercise log queries with parameters for a userID, limit, and date range.
+app.use(bodyParser.json());
+
+// For freeCodeCamp to be able to test the project remotely, we need to enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing):
+const cors = require('cors');
+app.use(cors());
+
+//We'll use the dotenv package to aba able to read .env variables
+require('dotenv').config();
+
+// We'll be using a database to hold and keep track of our users' exercise data. For this, we'll be using a no-SQL MongoDB database. We'll use Mongoose.js as the "front-end" for our DB.
+const mongoose = require('mongoose');
+// When we connect tyo our DB via Mongoose, we'll keep an eye on our connection with a callback function to make sure all is well with our connection:
 mongoose.connect(process.env.MONGO_URI,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=> console.log('DB connected')
 ).catch( err => console.log(err)
 );
 
-app.use(cors())
 
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(bodyParser.json())
+const User = require('./models/user');
+const Exercise = require('./models/exercise');
+
+// Finally, we're saving our functions in handlers/userHandler.js, so let's make sure that the file is accessible here:
+const userHandler = require("./handlers/userHandler.js");
+
 
 
 app.use(express.static('public'))
