@@ -53,6 +53,12 @@ app.get('/', (req, res) => {
 // If the user adds a new username to the database:
 app.post('/api/exercise/new-user', userHandler.addUser);
 
+// If the user requests for all users from database
+app.get('/api/exercise/users', userHandler.getAllUsers);
+
+// If the user tries to add exercises to a given username in the database:
+app.post('/api/exercise/add', userHandler.addExercise);
+
 
 // Not found middleware
 // app.use((req, res, next) => {
@@ -77,68 +83,6 @@ app.use((err, req, res, next) => {
   res.status(errCode).type('txt')
     .send(errMessage)
 })
-
-
-//create new exercise route
-
-app.post('/api/exercise/add', (req, res) => {
-  const username = req.body.username;
-  const description = req.body.description;
-  const duration = req.body.duration;
-  const date = req.body.date;
-  let userId;
-
-  if ((username=== undefined) || (description === undefined) || (duration === undefined) || (date === undefined)) {
-    res.send("Required field(s) are missing.");
-  } else if (username === '' || description === '' || duration === '') {
-    res.send("Required field(s) are blank")
-  } else if (username.length > 10) {
-    res.send("Username too long, cannot be more than 10 characters")
-  } else if (description.length > 100) {
-    res.send("Description length too long, should not be more than 100 characters")
-  } else if (isNaN(duration)) {
-    res.send("Duration must be a number")
-  } else if (Number(duration)> 1440) {
-    res.send("Duration cannot be more than 1440 minutes, (24 hours)")
-  } else if (date !== '' && isNaN(Date.parse(date))=== true) {
-    res.send("Thats not a valid date")
-  } else {
-   // find userID for username
-   User.findOne({ username}, (err, user)=> {
-     if (err) {
-       res.send("Error Searching for username, try again")
-     } else if (!user) {
-       res.send("Username not found")
-     } else {
-       userId = user.id;
-       // validations passed, convert duration
-       duration = Number(duration);
-
-       //convert date
-       if (date=== '') {
-         date = new Date()
-       } else {
-         date = Date.parse(date);
-       }
-
-       const newExercise = new Exercise({
-         userId,
-         description,
-         duration,
-         date,
-       });
-
-       newExercise.save((errSave, data)=> {
-         if (errSave) {
-           res.send("Error occured during save exercise");
-         } else {
-           res.json(data)
-         }
-       });
-     }
-   });
-  }
-});
 
 // read exercise route
 
