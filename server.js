@@ -38,11 +38,20 @@ mongoose.connect(process.env.MONGO_URI,{ useNewUrlParser: true, useUnifiedTopolo
 const userHandler = require("./handlers/userHandler.js");
 
 
+/////////////////////////////////
+///////// ROUTING SETUP /////////
+/////////////////////////////////
 
-app.use(express.static('public'))
+// We'll start by defining where we want to keep our static files (e.g. CSS files, JS files, images):
+app.use(express.static('public'));
+
+// Next, we'll define our homepage:
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
+
+// If the user adds a new username to the database:
+app.post('/api/exercise/new-user', userHandler.addUser);
 
 
 // Not found middleware
@@ -69,34 +78,6 @@ app.use((err, req, res, next) => {
     .send(errMessage)
 })
 
-// create New User
-app.post('/api/exercise/new-user', (req, res)=>{
-  
-  const username = req.body.username;
-
-  if (username === '') {
-    res.send("Username cannot be blank")
-  } else if (username.length > 10) {
-    res.send("Username too long")
-  } else {
-    const newUser = new User({
-      username,
-    });
-
-    newUser.save((err, data) => {
-      if (err) {
-        if (err.name==='MongoError' && err.code === 11000) {
-          //Duplicate Key error
-          res.send("Username already taken, try a different name");
-        } else {
-          res.send("Error occured while saving user")
-        }
-      } else {
-        res.json(data)
-      }
-    })
-  }
-})
 
 //create new exercise route
 
